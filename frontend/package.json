@@ -1,0 +1,13 @@
+{
+  "name": "mediator-frontend",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1",
+    "react-stripe-checkout": "^2.6.3",
+    "firebase": "^10.7.1"
+  },
+  "scripts": {
+    "start": "react-scripts start"
+  }
+}
