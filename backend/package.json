@@ -1,0 +1,11 @@
+{
+  "name": "mediator-backend",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "cors": "^2.8.5",
+    "stripe": "^14.10.0",
+    "firebase-admin": "^12.0.0",
+    "axios": "^1.6.5"
+  }
+}
