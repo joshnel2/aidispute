@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { postForm } from "../utils/api";
-import FileUpload from "../components/FileUpload";
+import DocumentInput from "../components/DocumentInput";
 import ResultPanel from "../components/ResultPanel";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner";
 
 export default function PlainLanguage() {
-  const [tab, setTab] = useState("paste");
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
@@ -19,7 +18,7 @@ export default function PlainLanguage() {
     setLoading(true);
     try {
       const formData = new FormData();
-      if (tab === "upload" && file) {
+      if (file) {
         formData.append("file", file);
       } else {
         formData.append("text", text);
@@ -33,13 +32,12 @@ export default function PlainLanguage() {
     }
   };
 
-  const canSubmit =
-    !loading && ((tab === "paste" && text.trim()) || (tab === "upload" && file));
+  const canSubmit = !loading && (file || text.trim());
 
   return (
     <div>
       <div className="page-header">
-        <h2>{"\u{1F4AC}"} Plain Language Translation</h2>
+        <h2>{"\u{1F524}"} Plain Language Translation</h2>
         <p>
           Translate complex legal documents into clear, everyday English that
           anyone can understand. Important provisions are highlighted so nothing
@@ -51,25 +49,14 @@ export default function PlainLanguage() {
 
       <div className="card">
         <div className="card-title">Legal Document</div>
-        <div className="tabs">
-          <button className={`tab ${tab === "paste" ? "active" : ""}`} onClick={() => setTab("paste")}>
-            Paste Text
-          </button>
-          <button className={`tab ${tab === "upload" ? "active" : ""}`} onClick={() => setTab("upload")}>
-            Upload File
-          </button>
-        </div>
-        {tab === "paste" ? (
-          <textarea
-            className="form-textarea"
-            placeholder="Paste the legal text here..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={12}
-          />
-        ) : (
-          <FileUpload file={file} onChange={setFile} id="plain-file" />
-        )}
+        <DocumentInput
+          file={file}
+          onFileChange={setFile}
+          text={text}
+          onTextChange={setText}
+          fileId="plain-file"
+          placeholder="Paste the legal text here..."
+        />
       </div>
 
       <button className="btn btn-primary" onClick={handleSubmit} disabled={!canSubmit}>

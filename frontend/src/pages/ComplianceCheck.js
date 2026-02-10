@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { postForm } from "../utils/api";
-import FileUpload from "../components/FileUpload";
+import DocumentInput from "../components/DocumentInput";
 import ResultPanel from "../components/ResultPanel";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner";
 
 export default function ComplianceCheck() {
-  const [tab, setTab] = useState("paste");
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
   const [jurisdiction, setJurisdiction] = useState("");
@@ -21,7 +20,7 @@ export default function ComplianceCheck() {
     setLoading(true);
     try {
       const formData = new FormData();
-      if (tab === "upload" && file) {
+      if (file) {
         formData.append("file", file);
       } else {
         formData.append("text", text);
@@ -37,8 +36,7 @@ export default function ComplianceCheck() {
     }
   };
 
-  const canSubmit =
-    !loading && ((tab === "paste" && text.trim()) || (tab === "upload" && file));
+  const canSubmit = !loading && (file || text.trim());
 
   return (
     <div>
@@ -54,25 +52,14 @@ export default function ComplianceCheck() {
 
       <div className="card">
         <div className="card-title">Document</div>
-        <div className="tabs">
-          <button className={`tab ${tab === "paste" ? "active" : ""}`} onClick={() => setTab("paste")}>
-            Paste Text
-          </button>
-          <button className={`tab ${tab === "upload" ? "active" : ""}`} onClick={() => setTab("upload")}>
-            Upload File
-          </button>
-        </div>
-        {tab === "paste" ? (
-          <textarea
-            className="form-textarea"
-            placeholder="Paste the document text here..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={12}
-          />
-        ) : (
-          <FileUpload file={file} onChange={setFile} id="compliance-file" />
-        )}
+        <DocumentInput
+          file={file}
+          onFileChange={setFile}
+          text={text}
+          onTextChange={setText}
+          fileId="compliance-file"
+          placeholder="Paste the document text here..."
+        />
       </div>
 
       <div className="card">

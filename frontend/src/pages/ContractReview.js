@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { postForm } from "../utils/api";
+import DocumentInput from "../components/DocumentInput";
 import FileUpload from "../components/FileUpload";
 import ResultPanel from "../components/ResultPanel";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner";
 
 export default function ContractReview() {
-  const [tab, setTab] = useState("paste"); // paste | upload
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
-  const [playbookTab, setPlaybookTab] = useState("none"); // none | paste | upload
   const [playbookText, setPlaybookText] = useState("");
   const [playbookFile, setPlaybookFile] = useState(null);
   const [result, setResult] = useState(null);
@@ -23,15 +22,15 @@ export default function ContractReview() {
 
     try {
       const formData = new FormData();
-      if (tab === "upload" && file) {
+      if (file) {
         formData.append("file", file);
       } else {
         formData.append("text", text);
       }
 
-      if (playbookTab === "upload" && playbookFile) {
+      if (playbookFile) {
         formData.append("playbook", playbookFile);
-      } else if (playbookTab === "paste" && playbookText.trim()) {
+      } else if (playbookText.trim()) {
         formData.append("playbookText", playbookText);
       }
 
@@ -44,8 +43,7 @@ export default function ContractReview() {
     }
   };
 
-  const canSubmit =
-    !loading && ((tab === "paste" && text.trim()) || (tab === "upload" && file));
+  const canSubmit = !loading && (file || text.trim());
 
   return (
     <div>
@@ -57,93 +55,55 @@ export default function ContractReview() {
           <span style={{ color: "var(--green)" }}>green (standard)</span>,{" "}
           <span style={{ color: "var(--yellow)" }}>yellow (risky)</span>, or{" "}
           <span style={{ color: "var(--red)" }}>red (critical)</span>.
-          Optionally upload your firm's playbook for deviation analysis.
+          Optionally provide your firm's playbook for deviation analysis.
         </p>
       </div>
 
       <ErrorBanner message={error} />
 
-      {/* Contract input */}
+      {/* Contract input — upload + paste side by side */}
       <div className="card">
         <div className="card-title">Contract Document</div>
 
-        <div className="tabs">
-          <button
-            className={`tab ${tab === "paste" ? "active" : ""}`}
-            onClick={() => setTab("paste")}
-          >
-            Paste Text
-          </button>
-          <button
-            className={`tab ${tab === "upload" ? "active" : ""}`}
-            onClick={() => setTab("upload")}
-          >
-            Upload File
-          </button>
-        </div>
-
-        {tab === "paste" ? (
-          <textarea
-            className="form-textarea"
-            placeholder="Paste the full contract text here..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={12}
-          />
-        ) : (
-          <FileUpload
-            file={file}
-            onChange={setFile}
-            id="contract-file"
-          />
-        )}
+        <DocumentInput
+          file={file}
+          onFileChange={setFile}
+          text={text}
+          onTextChange={setText}
+          fileId="contract-file"
+          placeholder="Paste the full contract text here..."
+        />
       </div>
 
-      {/* Playbook (optional) */}
+      {/* Playbook (optional) — upload + paste side by side */}
       <div className="card">
         <div className="card-title">Firm Playbook (Optional)</div>
         <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 16 }}>
-          Upload your firm's preferred terms and positions. The AI will flag any
+          Provide your firm's preferred terms and positions. The AI will flag any
           deviations from your playbook.
         </p>
 
-        <div className="tabs">
-          <button
-            className={`tab ${playbookTab === "none" ? "active" : ""}`}
-            onClick={() => setPlaybookTab("none")}
-          >
-            No Playbook
-          </button>
-          <button
-            className={`tab ${playbookTab === "paste" ? "active" : ""}`}
-            onClick={() => setPlaybookTab("paste")}
-          >
-            Paste
-          </button>
-          <button
-            className={`tab ${playbookTab === "upload" ? "active" : ""}`}
-            onClick={() => setPlaybookTab("upload")}
-          >
-            Upload
-          </button>
+        <div className="input-methods">
+          <div>
+            <label className="form-label">Upload Playbook</label>
+            <FileUpload
+              file={playbookFile}
+              onChange={setPlaybookFile}
+              id="playbook-file"
+            />
+          </div>
+          <div>
+            <label className="form-label">Or Paste Playbook</label>
+            <textarea
+              className="form-textarea"
+              placeholder="Paste your firm's playbook / preferred positions..."
+              value={playbookText}
+              onChange={(e) => setPlaybookText(e.target.value)}
+              style={{ minHeight: 180 }}
+              disabled={!!playbookFile}
+            />
+          </div>
         </div>
-
-        {playbookTab === "paste" && (
-          <textarea
-            className="form-textarea"
-            placeholder="Paste your firm's playbook / preferred positions here..."
-            value={playbookText}
-            onChange={(e) => setPlaybookText(e.target.value)}
-            rows={8}
-          />
-        )}
-        {playbookTab === "upload" && (
-          <FileUpload
-            file={playbookFile}
-            onChange={setPlaybookFile}
-            id="playbook-file"
-          />
-        )}
       </div>
 
       <button
