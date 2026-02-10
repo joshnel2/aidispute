@@ -183,18 +183,28 @@ app.post("/api/compliance-check", upload.single("file"), async (req, res) => {
 });
 
 // 6. Document Comparison
-app.post("/api/compare", async (req, res) => {
-  try {
-    const { documentA, documentB } = req.body;
-    if (!documentA || !documentB) return res.status(400).json({ error: "Two documents are required" });
-    const msg = `=== DOCUMENT A (Original) ===\n${documentA}\n\n=== DOCUMENT B (Revised) ===\n${documentB}`;
-    const result = await azureChat(SYSTEM_PROMPTS["compare"], msg);
-    res.json({ result });
-  } catch (err) {
-    console.error("Comparison error:", err);
-    res.status(500).json({ error: err.message });
+app.post(
+  "/api/compare",
+  upload.fields([
+    { name: "fileA", maxCount: 1 },
+    { name: "fileB", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      let docA = req.body.documentA || "";
+      let docB = req.body.documentB || "";
+      if (req.files?.fileA?.[0]) docA = await extractTextFromFile(req.files.fileA[0]);
+      if (req.files?.fileB?.[0]) docB = await extractTextFromFile(req.files.fileB[0]);
+      if (!docA.trim() || !docB.trim()) return res.status(400).json({ error: "Two documents are required" });
+      const msg = `=== DOCUMENT A (Original) ===\n${docA}\n\n=== DOCUMENT B (Revised) ===\n${docB}`;
+      const result = await azureChat(SYSTEM_PROMPTS["compare"], msg);
+      res.json({ result });
+    } catch (err) {
+      console.error("Comparison error:", err);
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 // 7. Summarization
 app.post("/api/summarize", upload.single("file"), async (req, res) => {
