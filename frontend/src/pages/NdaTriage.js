@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { postForm } from "../utils/api";
-import FileUpload from "../components/FileUpload";
+import DocumentInput from "../components/DocumentInput";
 import ResultPanel from "../components/ResultPanel";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner";
 
 export default function NdaTriage() {
-  const [tab, setTab] = useState("paste");
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
   const [riskThresholds, setRiskThresholds] = useState("");
@@ -21,7 +20,7 @@ export default function NdaTriage() {
 
     try {
       const formData = new FormData();
-      if (tab === "upload" && file) {
+      if (file) {
         formData.append("file", file);
       } else {
         formData.append("text", text);
@@ -39,8 +38,7 @@ export default function NdaTriage() {
     }
   };
 
-  const canSubmit =
-    !loading && ((tab === "paste" && text.trim()) || (tab === "upload" && file));
+  const canSubmit = !loading && (file || text.trim());
 
   return (
     <div>
@@ -58,32 +56,14 @@ export default function NdaTriage() {
       <div className="card">
         <div className="card-title">NDA Document</div>
 
-        <div className="tabs">
-          <button
-            className={`tab ${tab === "paste" ? "active" : ""}`}
-            onClick={() => setTab("paste")}
-          >
-            Paste Text
-          </button>
-          <button
-            className={`tab ${tab === "upload" ? "active" : ""}`}
-            onClick={() => setTab("upload")}
-          >
-            Upload File
-          </button>
-        </div>
-
-        {tab === "paste" ? (
-          <textarea
-            className="form-textarea"
-            placeholder="Paste the NDA text here..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={12}
-          />
-        ) : (
-          <FileUpload file={file} onChange={setFile} id="nda-file" />
-        )}
+        <DocumentInput
+          file={file}
+          onFileChange={setFile}
+          text={text}
+          onTextChange={setText}
+          fileId="nda-file"
+          placeholder="Paste the NDA text here..."
+        />
       </div>
 
       <div className="card">
@@ -98,7 +78,7 @@ export default function NdaTriage() {
           placeholder={`Example:\n- Maximum term: 3 years\n- Survival period must not exceed 2 years\n- No non-solicitation clauses\n- Mutual obligations only\n- Must allow residuals\n- Governing law: Delaware or New York only`}
           value={riskThresholds}
           onChange={(e) => setRiskThresholds(e.target.value)}
-          rows={6}
+          style={{ minHeight: 140 }}
         />
       </div>
 
