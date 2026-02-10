@@ -1,22 +1,101 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './Login';
-import Dashboard from './Dashboard';
-import Dispute from './Dispute';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 
-const App = () => {
+import Home from "./pages/Home";
+import ContractReview from "./pages/ContractReview";
+import NdaTriage from "./pages/NdaTriage";
+import ClauseExtraction from "./pages/ClauseExtraction";
+import DocumentDrafting from "./pages/DocumentDrafting";
+import ComplianceCheck from "./pages/ComplianceCheck";
+import DocumentCompare from "./pages/DocumentCompare";
+import Summarize from "./pages/Summarize";
+import PlainLanguage from "./pages/PlainLanguage";
+import RiskAssessment from "./pages/RiskAssessment";
+import LegalChat from "./pages/LegalChat";
+
+const NAV_SECTIONS = [
+  {
+    title: "Analysis",
+    items: [
+      { path: "/review-contract", icon: "\u{1F4DD}", label: "Contract Review" },
+      { path: "/triage-nda", icon: "\u{1F4CB}", label: "NDA Triage" },
+      { path: "/risk-assessment", icon: "\u{26A0}\uFE0F", label: "Risk Assessment" },
+      { path: "/clause-extraction", icon: "\u{1F50D}", label: "Clause Extraction" },
+      { path: "/compliance-check", icon: "\u2705", label: "Compliance Check" },
+    ],
+  },
+  {
+    title: "Documents",
+    items: [
+      { path: "/summarize", icon: "\u{1F4C4}", label: "Summarize" },
+      { path: "/plain-language", icon: "\u{1F4AC}", label: "Plain Language" },
+      { path: "/compare", icon: "\u{1F504}", label: "Compare Docs" },
+      { path: "/draft", icon: "\u270F\uFE0F", label: "Draft Document" },
+    ],
+  },
+  {
+    title: "Assistant",
+    items: [
+      { path: "/chat", icon: "\u{1F4AC}", label: "Legal Q&A" },
+    ],
+  },
+];
+
+function App() {
   return (
-    <div style={{ background: 'black', color: 'white', fontFamily: 'Inter, sans-serif', minHeight: '100vh' }}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dispute/:id" element={<Dispute />} />
-        </Routes>
-      </Router>
-      <footer style={{ textAlign: 'center', padding: '10px' }}>Decentralized Technology Solutions 2025</footer>
-    </div>
+    <Router>
+      <div className="app-layout">
+        {/* Sidebar */}
+        <aside className="sidebar">
+          <div className="sidebar-header">
+            <NavLink to="/" className="sidebar-logo">
+              <span className="sidebar-logo-icon">{"\u2696\uFE0F"}</span>
+              <div className="sidebar-logo-text">
+                <h1>Legal AI</h1>
+                <span>Azure OpenAI</span>
+              </div>
+            </NavLink>
+          </div>
+
+          {NAV_SECTIONS.map((section) => (
+            <div className="sidebar-section" key={section.title}>
+              <div className="sidebar-section-title">{section.title}</div>
+              <ul className="sidebar-nav">
+                {section.items.map((item) => (
+                  <li key={item.path}>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      <span className="nav-icon">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </aside>
+
+        {/* Main content */}
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/review-contract" element={<ContractReview />} />
+            <Route path="/triage-nda" element={<NdaTriage />} />
+            <Route path="/clause-extraction" element={<ClauseExtraction />} />
+            <Route path="/draft" element={<DocumentDrafting />} />
+            <Route path="/compliance-check" element={<ComplianceCheck />} />
+            <Route path="/compare" element={<DocumentCompare />} />
+            <Route path="/summarize" element={<Summarize />} />
+            <Route path="/plain-language" element={<PlainLanguage />} />
+            <Route path="/risk-assessment" element={<RiskAssessment />} />
+            <Route path="/chat" element={<LegalChat />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
-};
+}
 
 export default App;

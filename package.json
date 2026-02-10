@@ -1,0 +1,12 @@
+{
+  "name": "legal-ai-platform",
+  "version": "1.0.0",
+  "description": "AI-powered legal document analysis platform — powered by Azure OpenAI",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "start:backend": "cd backend && node server.js",
+    "start:frontend": "cd frontend && npm start",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "cd backend && node server.js"
+  }
+}
