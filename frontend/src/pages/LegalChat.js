@@ -14,7 +14,7 @@ export default function LegalChat() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, loading]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -57,17 +57,21 @@ export default function LegalChat() {
 
   return (
     <div>
-      <div className="page-header" style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header" style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
           <div>
             <h2>{"\u{1F4AC}"} Legal Q&A Chat</h2>
             <p>
-              Ask any legal question — contract interpretation, regulatory
-              queries, case analysis, strategy discussions.
+              Ask any legal question. Conversation context is maintained for
+              follow-up questions.
             </p>
           </div>
           {messages.length > 0 && (
-            <button className="btn btn-secondary btn-sm" onClick={handleClear}>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={handleClear}
+              style={{ flexShrink: 0, marginTop: 4 }}
+            >
               Clear Chat
             </button>
           )}
@@ -79,21 +83,12 @@ export default function LegalChat() {
       <div className="chat-container">
         <div className="chat-messages">
           {messages.length === 0 && (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "60px 20px",
-                color: "var(--text-muted)",
-              }}
-            >
-              <div style={{ fontSize: 48, marginBottom: 16 }}>{"\u2696\uFE0F"}</div>
-              <h3 style={{ marginBottom: 8, color: "var(--text-secondary)" }}>
-                Legal AI Assistant
-              </h3>
-              <p style={{ maxWidth: 480, margin: "0 auto", fontSize: 14, lineHeight: 1.6 }}>
-                Ask me about contract law, regulatory compliance, legal strategy,
-                document interpretation, or any other legal topic. I maintain
-                conversation context so you can ask follow-up questions.
+            <div className="chat-empty">
+              <div className="chat-empty-icon">{"\u2696\uFE0F"}</div>
+              <h3>Legal AI Assistant</h3>
+              <p>
+                Ask about contract law, regulatory compliance, legal strategy,
+                document interpretation, or any other legal topic.
               </p>
             </div>
           )}
@@ -121,9 +116,15 @@ export default function LegalChat() {
             <div className="chat-message assistant">
               <div className="chat-avatar">{"\u2696\uFE0F"}</div>
               <div className="chat-bubble">
-                <div className="loading" style={{ padding: "8px 0" }}>
-                  <div className="spinner" />
-                  <span>Thinking...</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "4px 0" }}>
+                  <div className="loading-dots">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                    Thinking...
+                  </span>
                 </div>
               </div>
             </div>
@@ -145,6 +146,7 @@ export default function LegalChat() {
             className="btn btn-primary"
             onClick={handleSend}
             disabled={!input.trim() || loading}
+            style={{ borderRadius: 24, padding: "12px 24px" }}
           >
             Send
           </button>

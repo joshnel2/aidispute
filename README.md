@@ -2,7 +2,7 @@
 
 AI-powered legal document analysis, review, and drafting — built on **Azure OpenAI**.
 
-This platform replicates the full feature set of the Claude Cowork Legal Plugin, using Azure AI Foundry as the AI backend.
+Replicates the full feature set of the Claude Cowork Legal Plugin, using Azure AI Foundry as the AI backend. Designed for **Azure App Service** deployment.
 
 ---
 
@@ -54,12 +54,11 @@ This platform replicates the full feature set of the Claude Cowork Legal Plugin,
 
 ---
 
-## Prerequisites
+## Azure App Service Deployment
 
-- **Node.js** v18+
-- **Azure OpenAI** resource (via Azure AI Foundry)
+This project is structured for one-click Azure Web App deployment:
 
-## Environment Variables
+### Environment Variables (App Settings)
 
 | Variable | Description |
 |----------|-------------|
@@ -67,46 +66,81 @@ This platform replicates the full feature set of the Claude Cowork Legal Plugin,
 | `AZURE_OPENAI_ENDPOINT` | Endpoint URL (e.g., `https://my-resource.openai.azure.com`) |
 | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment name (e.g., `gpt-4o`) |
 
-## Setup
+### Deploy to Azure
+
+1. Create a **Node.js** App Service (Node 18+ LTS)
+2. Set the three environment variables above in **Configuration > Application settings**
+3. Deploy via:
+   - **GitHub Actions** (connect your repo)
+   - **Azure CLI**: `az webapp up --name your-app-name --runtime "NODE:18-lts"`
+   - **VS Code Azure extension**
+
+Azure will automatically:
+- Run `npm install` (installs backend deps)
+- Run `postinstall` script (installs frontend deps & builds React)
+- Start the server via `npm start`
+
+The `web.config` is included for IIS/iisnode integration.
+
+---
+
+## Local Development
+
+### Prerequisites
+- Node.js v18+
+- Azure OpenAI resource (via Azure AI Foundry)
+
+### Setup
 
 ```bash
-# 1. Clone the repo
+# Clone the repo
 git clone <repo-url>
 cd legal-ai-platform
 
-# 2. Copy env file and fill in your Azure credentials
+# Create .env from example
 cp .env.example .env
+# Edit .env with your Azure OpenAI credentials
 
-# 3. Install dependencies
-npm run install:all
+# Install all dependencies (root + frontend)
+npm install
 
-# 4. Build the frontend
-npm run build:frontend
-
-# 5. Start the server (serves both API and frontend)
+# Start the server (serves API + built frontend on port 8080)
 npm start
 ```
 
-The app will be available at `http://localhost:5000`.
-
-### Development Mode
-
-Run backend and frontend separately:
+### Development mode (hot reload)
 
 ```bash
-# Terminal 1 — Backend (port 5000)
-npm run start:backend
+# Terminal 1 — Backend (port 8080)
+npm run dev:backend
 
-# Terminal 2 — Frontend dev server (port 3000, proxies API to 5000)
-npm run start:frontend
+# Terminal 2 — Frontend dev server (port 3000, proxies to 8080)
+npm run dev:frontend
 ```
 
-## Azure AI Foundry Setup
+## Project Structure
 
-1. Go to [Azure AI Foundry](https://ai.azure.com)
-2. Create or select an Azure OpenAI resource
-3. Deploy a model (e.g., `gpt-4o`, `gpt-4o-mini`)
-4. Copy the **API Key**, **Endpoint**, and **Deployment Name** to your `.env` file
+```
+/
+├── server.js              # Express API server
+├── azure-openai.js        # Azure OpenAI REST client
+├── prompts.js             # System prompts for all tools
+├── file-parser.js         # PDF / text file extraction
+├── package.json           # Root deps + Azure deploy scripts
+├── web.config             # Azure IIS configuration
+├── .env.example           # Environment variable template
+└── frontend/
+    ├── package.json
+    ├── public/
+    │   └── index.html
+    └── src/
+        ├── App.js
+        ├── index.js
+        ├── index.css
+        ├── components/    # Shared UI components
+        ├── pages/         # Route pages
+        └── utils/         # API helpers
+```
 
 ## Tech Stack
 
@@ -114,3 +148,4 @@ npm run start:frontend
 - **Frontend**: React, React Router, React Markdown
 - **AI**: Azure OpenAI (REST API)
 - **File Parsing**: pdf-parse
+- **Deployment**: Azure App Service (Node.js)

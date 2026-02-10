@@ -2,11 +2,23 @@
   "name": "legal-ai-platform",
   "version": "1.0.0",
   "description": "AI-powered legal document analysis platform — powered by Azure OpenAI",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "install:all": "cd backend && npm install && cd ../frontend && npm install",
-    "start:backend": "cd backend && node server.js",
-    "start:frontend": "cd frontend && npm start",
-    "build:frontend": "cd frontend && npm run build",
-    "start": "cd backend && node server.js"
+    "start": "node server.js",
+    "postinstall": "cd frontend && npm install --legacy-peer-deps && npm run build",
+    "build": "cd frontend && npm install --legacy-peer-deps && npm run build",
+    "dev:backend": "node server.js",
+    "dev:frontend": "cd frontend && npm start"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.1",
+    "uuid": "^11.0.5"
   }
 }
