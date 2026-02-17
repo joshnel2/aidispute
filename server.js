@@ -38,17 +38,33 @@ const upload = multer({
     const allowed = [
       "application/pdf",
       "text/plain",
+      "text/csv",
+      "text/markdown",
+      "text/rtf",
+      "application/rtf",
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.oasis.opendocument.text",
     ];
+    const allowedExtensions = [
+      ".pdf", ".txt", ".md", ".csv",
+      ".doc", ".docx", ".rtf", ".odt",
+      ".xls", ".xlsx",
+      ".ppt", ".pptx",
+    ];
+    const name = (file.originalname || "").toLowerCase();
     if (
       allowed.includes(file.mimetype) ||
-      file.originalname.endsWith(".txt") ||
-      file.originalname.endsWith(".md")
+      file.mimetype.startsWith("text/") ||
+      allowedExtensions.some((ext) => name.endsWith(ext))
     ) {
       cb(null, true);
     } else {
-      cb(new Error("Only PDF, TXT, DOC, and DOCX files are supported"));
+      cb(new Error("Unsupported file type. Supported formats: PDF, TXT, DOC, DOCX, CSV, XLS, XLSX, RTF, ODT, PPT, PPTX"));
     }
   },
 });

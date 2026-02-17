@@ -1,9 +1,11 @@
 /**
  * File parser – extracts text from uploaded files.
- * Supports PDF and plain text.
+ * Supports PDF, DOCX, DOC, CSV, XLS, XLSX, RTF, TXT, MD, and more.
  */
 
 const pdfParse = require("pdf-parse");
+const mammoth = require("mammoth");
+const XLSX = require("xlsx");
 
 /**
  * Extract text content from an uploaded file (multer file object).
@@ -24,7 +26,65 @@ async function extractTextFromFile(file) {
     return data.text || "";
   }
 
-  // Plain text / markdown / doc-ish fallback
+  // DOCX (use mammoth for proper extraction)
+  if (
+    mime ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    name.endsWith(".docx")
+  ) {
+    const result = await mammoth.extractRawText({ buffer: file.buffer });
+    return result.value || "";
+  }
+
+  // DOC (legacy binary Word format — best-effort raw text extraction)
+  if (mime === "application/msword" || name.endsWith(".doc")) {
+    const raw = file.buffer.toString("utf-8");
+    const cleaned = raw.replace(/[^\x20-\x7E\n\r\t]/g, " ").replace(/ {2,}/g, " ");
+    return cleaned;
+  }
+
+  // CSV
+  if (
+    mime === "text/csv" ||
+    mime === "application/csv" ||
+    name.endsWith(".csv")
+  ) {
+    return file.buffer.toString("utf-8");
+  }
+
+  // Excel (XLS / XLSX)
+  if (
+    mime === "application/vnd.ms-excel" ||
+    mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    name.endsWith(".xls") ||
+    name.endsWith(".xlsx")
+  ) {
+    const workbook = XLSX.read(file.buffer, { type: "buffer" });
+    const sheets = [];
+    for (const sheetName of workbook.SheetNames) {
+      const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+      sheets.push(`--- Sheet: ${sheetName} ---\n${csv}`);
+    }
+    return sheets.join("\n\n");
+  }
+
+  // RTF (strip RTF control words for a rough plain-text extraction)
+  if (
+    mime === "text/rtf" ||
+    mime === "application/rtf" ||
+    name.endsWith(".rtf")
+  ) {
+    const raw = file.buffer.toString("utf-8");
+    const text = raw
+      .replace(/\{\\[^{}]*\}/g, "")
+      .replace(/\\[a-z]+[-]?\d*\s?/gi, "")
+      .replace(/[{}]/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    return text;
+  }
+
+  // Plain text / markdown / ODT / any other text-based format
   if (
     mime.startsWith("text/") ||
     name.endsWith(".txt") ||
@@ -33,22 +93,7 @@ async function extractTextFromFile(file) {
     return file.buffer.toString("utf-8");
   }
 
-  // For DOC/DOCX we do a best-effort raw text extraction
-  // (a full OOXML parser would be heavier — keep it simple)
-  if (
-    mime === "application/msword" ||
-    mime ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-    name.endsWith(".doc") ||
-    name.endsWith(".docx")
-  ) {
-    // Attempt to pull readable strings from the binary
-    const raw = file.buffer.toString("utf-8");
-    // Strip non-printable characters but keep newlines/spaces
-    const cleaned = raw.replace(/[^\x20-\x7E\n\r\t]/g, " ").replace(/ {2,}/g, " ");
-    return cleaned;
-  }
-
+  // Fallback: attempt UTF-8 decode
   return file.buffer.toString("utf-8");
 }
 

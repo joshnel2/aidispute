@@ -22,7 +22,7 @@ export default function FileUpload({ label, file, onChange, id, hint }) {
             ref={inputRef}
             type="file"
             id={id || "file-upload"}
-            accept=".pdf,.txt,.doc,.docx,.md"
+            accept=".pdf,.txt,.doc,.docx,.md,.csv,.xls,.xlsx,.rtf,.odt,.pptx,.ppt"
             onChange={(e) => onChange(e.target.files[0] || null)}
           />
           <div className="file-upload-icon">{"\u{1F4C1}"}</div>
@@ -30,7 +30,7 @@ export default function FileUpload({ label, file, onChange, id, hint }) {
             <strong>Click to upload</strong> or drag and drop
           </div>
           <div className="file-upload-hint">
-            {hint || "PDF, TXT, DOC, DOCX (max 10MB)"}
+            {hint || "PDF, TXT, DOC, DOCX, CSV, XLS, XLSX, RTF, and more (max 10MB)"}
           </div>
         </div>
       ) : (
