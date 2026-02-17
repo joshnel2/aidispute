@@ -344,7 +344,7 @@ Top 5 risks to address first, in order of priority.
 Risks that cannot be fully mitigated and must be accepted or insured against.`,
 
   // ---------------------------------------------------------------
-  // 10. Legal Q&A Chat
+  // 10. Chat
   // ---------------------------------------------------------------
   "chat": `You are a knowledgeable legal AI assistant. You help attorneys, legal professionals, and business users with legal questions and analysis.
 

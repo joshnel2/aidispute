@@ -41,7 +41,7 @@ const NAV_SECTIONS = [
   },
   {
     title: "Assistant",
-    items: [{ path: "/chat", icon: "\u{1F4AC}", label: "Legal Q&A" }],
+    items: [{ path: "/chat", icon: "\u{1F4AC}", label: "Chat" }],
   },
 ];
 

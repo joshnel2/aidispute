@@ -79,13 +79,14 @@ function getOrCreateSession(id) {
   return sessions.get(id);
 }
 
-// Purge stale sessions every 30 min
+// Purge stale sessions older than 90 days (check every hour)
+const SESSION_MAX_AGE_MS = 90 * 24 * 3600000; // 90 days
 setInterval(() => {
   const now = Date.now();
   for (const [id, s] of sessions) {
-    if (now - s.createdAt > 2 * 3600000) sessions.delete(id);
+    if (now - s.createdAt > SESSION_MAX_AGE_MS) sessions.delete(id);
   }
-}, 1800000);
+}, 3600000);
 
 // ═════════════════════════════════════════════════════════════════
 //  API Routes
@@ -264,7 +265,7 @@ app.post("/api/risk-assessment", upload.single("file"), async (req, res) => {
   }
 });
 
-// 10. Legal Q&A Chat
+// 10. Chat
 app.post("/api/chat", async (req, res) => {
   try {
     const { message, sessionId } = req.body;

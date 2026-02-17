@@ -72,7 +72,7 @@ const DOC_TOOLS = [
   {
     path: "/chat",
     icon: "\u{1F4AC}",
-    title: "Legal Q&A Chat",
+    title: "Chat",
     desc: "Multi-turn conversation for contract interpretation, regulatory questions, and legal strategy.",
     accent: "pink",
   },
