@@ -9,6 +9,40 @@
 
 const API_VERSION = "2025-01-01-preview";
 
+function isUnsupportedParameterError(errorBody, parameterName) {
+  const normalized = errorBody.toLowerCase();
+  return (
+    normalized.includes(parameterName.toLowerCase()) &&
+    (normalized.includes("unsupported parameter") ||
+      normalized.includes("not supported") ||
+      normalized.includes("does not support"))
+  );
+}
+
+async function sendChatCompletionRequest(url, apiKey, body) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      status: response.status,
+      errorBody: await response.text(),
+    };
+  }
+
+  return {
+    ok: true,
+    data: await response.json(),
+  };
+}
+
 function getConfig() {
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
@@ -50,24 +84,33 @@ async function azureChat(systemPrompt, userMessage, messages = null) {
     max_completion_tokens: 4096,
     top_p: 0.95,
   };
+  let requestResult = await sendChatCompletionRequest(url, apiKey, body);
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "api-key": apiKey,
-    },
-    body: JSON.stringify(body),
-  });
+  if (!requestResult.ok) {
+    const retryBody = { ...body };
+    let shouldRetry = false;
 
-  if (!response.ok) {
-    const errorBody = await response.text();
+    if (isUnsupportedParameterError(requestResult.errorBody, "temperature")) {
+      delete retryBody.temperature;
+      shouldRetry = true;
+    }
+    if (isUnsupportedParameterError(requestResult.errorBody, "top_p")) {
+      delete retryBody.top_p;
+      shouldRetry = true;
+    }
+
+    if (shouldRetry) {
+      requestResult = await sendChatCompletionRequest(url, apiKey, retryBody);
+    }
+  }
+
+  if (!requestResult.ok) {
     throw new Error(
-      `Azure OpenAI API error (${response.status}): ${errorBody}`
+      `Azure OpenAI API error (${requestResult.status}): ${requestResult.errorBody}`
     );
   }
 
-  const data = await response.json();
+  const data = requestResult.data;
 
   if (!data.choices || data.choices.length === 0) {
     throw new Error("Azure OpenAI returned no choices");
