@@ -3,7 +3,7 @@
  *
  * Uses the REST API directly (no SDK dependency issues) with:
  *   AZURE_OPENAI_ENDPOINT          – e.g. https://my-resource.openai.azure.com
- *   AZURE_OPENAI_DEPLOYMENT_NAME   – e.g. gpt-4o
+ *   AZURE_OPENAI_DEPLOYMENT_NAME   – e.g. gpt-5.2-chat
  *   AZURE_OPENAI_API_KEY           – your key from Azure AI Foundry
  */
 
