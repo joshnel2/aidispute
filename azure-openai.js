@@ -7,7 +7,7 @@
  *   AZURE_OPENAI_API_KEY           – your key from Azure AI Foundry
  */
 
-const API_VERSION = "2024-08-01-preview";
+const API_VERSION = "2025-01-01-preview";
 
 function getConfig() {
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
@@ -47,7 +47,7 @@ async function azureChat(systemPrompt, userMessage, messages = null) {
   const body = {
     messages: chatMessages,
     temperature: 0.3,
-    max_tokens: 4096,
+    max_completion_tokens: 4096,
     top_p: 0.95,
   };
 
