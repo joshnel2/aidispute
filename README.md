@@ -64,7 +64,7 @@ This project is structured for one-click Azure Web App deployment:
 |----------|-------------|
 | `AZURE_OPENAI_API_KEY` | API key from Azure AI Foundry |
 | `AZURE_OPENAI_ENDPOINT` | Endpoint URL (e.g., `https://my-resource.openai.azure.com`) |
-| `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment name (e.g., `gpt-4o`) |
+| `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment name (e.g., `gpt-4o`, `gpt-4.1`) |
 
 ### Deploy to Azure
 
