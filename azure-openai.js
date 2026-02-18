@@ -44,11 +44,12 @@ async function azureChat(systemPrompt, userMessage, messages = null) {
     chatMessages.push({ role: "user", content: userMessage });
   }
 
+  const supportsTemperature = !/\b(o[1-9]|gpt-5)/i.test(deploymentName);
+
   const body = {
     messages: chatMessages,
-    temperature: 0.3,
     max_completion_tokens: 4096,
-    top_p: 0.95,
+    ...(supportsTemperature && { temperature: 0.3, top_p: 0.95 }),
   };
 
   const response = await fetch(url, {
