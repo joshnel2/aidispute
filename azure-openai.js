@@ -49,14 +49,6 @@ async function azureChat(systemPrompt, userMessage, messages = null) {
     max_completion_tokens: 4096,
   };
 
-  // Some Azure OpenAI models (e.g. o-series reasoning models) only accept the
-  // default temperature (1) and do not support top_p.  Set
-  // AZURE_OPENAI_SUPPORTS_TEMPERATURE=true if your deployment allows these.
-  if (process.env.AZURE_OPENAI_SUPPORTS_TEMPERATURE === "true") {
-    body.temperature = parseFloat(process.env.AZURE_OPENAI_TEMPERATURE || "0.3");
-    body.top_p = parseFloat(process.env.AZURE_OPENAI_TOP_P || "0.95");
-  }
-
   const response = await fetch(url, {
     method: "POST",
     headers: {
