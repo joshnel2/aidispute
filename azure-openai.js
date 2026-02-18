@@ -80,9 +80,7 @@ async function azureChat(systemPrompt, userMessage, messages = null) {
 
   const body = {
     messages: chatMessages,
-    temperature: 0.3,
     max_completion_tokens: 4096,
-    top_p: 0.95,
   };
   let requestResult = await sendChatCompletionRequest(url, apiKey, body);
 
